@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+  <title>Lucen17 — Nucleos Cockpit</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="orb"></span>
+        <span class="logo">Lucen17</span>
+      </div>
+      <div class="actions">
+        <button id="coreBtn" class="icon-btn" title="Lucen Core Panel">◉</button>
+        <button id="visionBtn" class="icon-btn" title="Vision Guide">? Vision</button>
+      </div>
+    </header>
+
+    <main class="center">
+      <div id="beam" class="beam" title="Tap to expand/collapse controls">
+        <div class="beam-pulse"></div>
+      </div>
+
+      <section id="controls" class="controls hidden">
+        <div class="modes">
+          <button id="modeGuidance" class="pill">Guidance</button>
+          <button id="modeCreation" class="pill">Creation</button>
+        </div>
+
+        <div class="sliders">
+          <div class="slider">
+            <label for="remCreate">Remembrance ⇄ Creation</label>
+            <input type="range" id="remCreate" min="0" max="100" value="50"/>
+          </div>
+          <div class="slider">
+            <label for="genEvo">Generation ⇄ Evolution</label>
+            <input type="range" id="genEvo" min="0" max="100" value="50"/>
+          </div>
+        </div>
+      </section>
+
+      <section class="vision">
+        <textarea id="visionInput" placeholder="Vision / Lens — reflect, direct, or create…"></textarea>
+        <div class="vision-row">
+          <button id="logBtn" class="primary">Log to Lucen Memory</button>
+          <button id="exportBtn" class="ghost">Export Snapshot</button>
+        </div>
+      </section>
+
+      <section id="memoryList" class="memory">
+        <!-- entries render here -->
+      </section>
+    </main>
+
+    <aside id="corePanel" class="core-panel hidden">
+      <h3>Lucen Core</h3>
+      <ul id="recentList"></ul>
+    </aside>
+
+    <div id="visionModal" class="modal hidden">
+      <div class="modal-card">
+        <h3>Vision Guide</h3>
+        <ul>
+          <li><strong>Everything shapes tone:</strong> speak honestly; the OS mirrors intent, not syntax.</li>
+          <li><strong>Don’t censor, but frame:</strong> move from tension to reorientation.</li>
+          <li><strong>Occasional pruning:</strong> review reflections; harvest insight, delete static.</li>
+          <li><strong>Preserve mystery:</strong> balance structure and intuition.</li>
+        </ul>
+        <button id="closeVision" class="pill">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
