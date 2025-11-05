@@ -1,57 +1,90 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
-  <title>Lucen17 — Nucleos Cockpit</title>
+  <title>Lucen17 — Live Cockpit (v1.7 shell)</title>
   <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
   <div id="app">
     <header class="topbar">
-      <div class="brand">
-        <span class="orb"></span>
-        <span class="logo">Lucen17</span>
-      </div>
+      <div class="brand"><span class="orb"></span><span class="logo">Lucen17</span></div>
+      <nav class="tabs">
+        <button class="tab active" data-tab="core">Core</button>
+        <button class="tab" data-tab="divisions">Divisions</button>
+        <button class="tab" data-tab="gates">Gates</button>
+      </nav>
       <div class="actions">
+        <span id="backendBadge" class="badge offline" title="Backend disconnected">Offline</span>
         <button id="coreBtn" class="icon-btn" title="Lucen Core Panel">◉</button>
         <button id="visionBtn" class="icon-btn" title="Vision Guide">? Vision</button>
       </div>
     </header>
 
     <main class="center">
-      <div id="beam" class="beam" title="Tap to expand/collapse controls">
-        <div class="beam-pulse"></div>
-      </div>
-
-      <section id="controls" class="controls hidden">
-        <div class="modes">
-          <button id="modeGuidance" class="pill">Guidance</button>
-          <button id="modeCreation" class="pill">Creation</button>
+      <section class="tab-panel" data-tab="core">
+        <div id="beam" class="beam" title="Tap to expand/collapse controls">
+          <div class="beam-pulse"></div>
         </div>
-
-        <div class="sliders">
-          <div class="slider">
-            <label for="remCreate">Remembrance ⇄ Creation</label>
-            <input type="range" id="remCreate" min="0" max="100" value="50"/>
+        <section id="controls" class="controls hidden">
+          <div class="modes">
+            <button id="modeGuidance" class="pill">Guidance</button>
+            <button id="modeCreation" class="pill">Creation</button>
           </div>
-          <div class="slider">
-            <label for="genEvo">Generation ⇄ Evolution</label>
-            <input type="range" id="genEvo" min="0" max="100" value="50"/>
+          <div class="sliders">
+            <div class="slider">
+              <label for="remCreate">Remembrance ⇄ Creation</label>
+              <input type="range" id="remCreate" min="0" max="100" value="50"/>
+            </div>
+            <div class="slider">
+              <label for="genEvo">Generation ⇄ Evolution</label>
+              <input type="range" id="genEvo" min="0" max="100" value="50"/>
+            </div>
+          </div>
+        </section>
+
+        <section class="vision">
+          <textarea id="visionInput" placeholder="Vision / Lens — reflect, direct, or create…"></textarea>
+          <div class="vision-row">
+            <button id="logBtn" class="primary">Log to Lucen Memory</button>
+            <button id="exportBtn" class="ghost">Export Snapshot</button>
+          </div>
+        </section>
+
+        <section id="memoryList" class="memory"></section>
+      </section>
+
+      <section class="tab-panel hidden" data-tab="divisions">
+        <div class="grid">
+          <div class="card"><h3>Farm OS</h3><p>Soil, beds, livestock, tasks.</p><button class="ghost small" data-div="Farm OS">Open</button></div>
+          <div class="card"><h3>Learn Lume</h3><p>Education freedom tools & tracks.</p><button class="ghost small" data-div="Learn Lume">Open</button></div>
+          <div class="card"><h3>Dara Gate</h3><p>Earth gate — grounded creation.</p><button class="ghost small" data-div="Dara">Open</button></div>
+          <div class="card"><h3>Vara Gate</h3><p>Sky gate — connective interface.</p><button class="ghost small" data-div="Vara">Open</button></div>
+        </div>
+        <div id="divisionPanel" class="panel hidden">
+          <div class="panel-head"><h3 id="divisionTitle">Division</h3><button id="closeDivision" class="pill">Close</button></div>
+          <div class="panel-body">
+            <label>Focus hours today</label><input id="focusHours" type="number" min="0" step="0.25" />
+            <label>Recent wins</label><textarea id="recentWins"></textarea>
+            <label>Blockers</label><textarea id="blockers"></textarea>
+            <label>Mood / tone</label><input id="moodTone" type="text" placeholder="steady / strained / sharp / bright…" />
+            <div class="panel-actions"><button id="saveDivision" class="primary">Save Division State</button></div>
           </div>
         </div>
       </section>
 
-      <section class="vision">
-        <textarea id="visionInput" placeholder="Vision / Lens — reflect, direct, or create…"></textarea>
-        <div class="vision-row">
-          <button id="logBtn" class="primary">Log to Lucen Memory</button>
-          <button id="exportBtn" class="ghost">Export Snapshot</button>
+      <section class="tab-panel hidden" data-tab="gates">
+        <div class="card">
+          <h3>Gates & Tolls</h3>
+          <p>This front-end is ready. Connect a backend API URL to enable tokens and payments.</p>
+          <div class="form-grid">
+            <label>API Base URL</label>
+            <input id="apiUrl" type="url" placeholder="https://your-api.example.com"/>
+            <button id="saveApiUrl" class="pill">Save</button>
+          </div>
+          <div class="list" id="gateList"></div>
         </div>
-      </section>
-
-      <section id="memoryList" class="memory">
-        <!-- entries render here -->
       </section>
     </main>
 
@@ -73,7 +106,6 @@
       </div>
     </div>
   </div>
-
   <script src="script.js"></script>
 </body>
 </html>

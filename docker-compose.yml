@@ -1,0 +1,18 @@
+version: '3.9'
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: lucen
+      POSTGRES_PASSWORD: lucen
+      POSTGRES_DB: lucen
+    ports: [ "5432:5432" ]
+    volumes: [ "db_data:/var/lib/postgresql/data" ]
+  api:
+    build: ./api
+    environment:
+      DATABASE_URL: postgresql://lucen:lucen@db:5432/lucen
+      PORT: 8081
+    depends_on: [ db ]
+    ports: [ "8081:8081" ]
+volumes: { db_data: {} }
