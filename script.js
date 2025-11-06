@@ -4,6 +4,7 @@
   const modeKey = 'nucleos.mode';
   const divisionsKey = 'lucen.divisions';
   const apiUrlKey = 'lucen.api.url';
+  localStorage.setItem(apiUrlKey, "https://lucen-os-v17.onrender.com");
 
   const now = () => new Date().toISOString();
   const loadJSON = (k, d)=>{try{ return JSON.parse(localStorage.getItem(k) || JSON.stringify(d)); }catch(e){ return d; }};
