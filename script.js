@@ -48,6 +48,68 @@
   const moodTone = document.getElementById('moodTone');
   const saveDivision = document.getElementById('saveDivision');
 
+  // === Dual-mode helpers ===
+function apiBase() {
+  return localStorage.getItem("lucen.api")
+    || document.querySelector("#apiBase")?.value
+    || "";
+}
+
+async function postJSON(url, data) {
+  const r = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
+  if (!r.ok) throw new Error(`POST ${url} ${r.status}`);
+  return r.json();
+}
+
+async function getJSON(url) {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`GET ${url} ${r.status}`);
+  return r.json();
+}
+
+// Save reflection locally + send to server (if configured)
+async function saveReflectionDual(text, tone) {
+  const entry = { text, tone, ts: Date.now(), deviceId: "web" };
+  const key = "lucen_memory";
+  const mem = JSON.parse(localStorage.getItem(key) || "[]");
+  mem.push(entry);
+  localStorage.setItem(key, JSON.stringify(mem));
+
+  const base = apiBase();
+  if (base) {
+    try { await postJSON(`${base}/memory`, entry); }
+    catch (e) { console.warn("Server save failed:", e.message); }
+  }
+}
+
+// Sync from server into UI
+async function syncFromServerIntoUI() {
+  const base = apiBase();
+  if (!base) return;
+  try {
+    const items = await getJSON(`${base}/memory?limit=200`);
+    renderServerMemory(items || []);
+  } catch (e) {
+    console.warn("Server fetch failed:", e.message);
+  }
+}
+
+function renderServerMemory(items) {
+  const list = document.querySelector("#memoryList");
+  if (!list) return;
+  const fmt = (t) => new Date(t).toLocaleString();
+  list.innerHTML = items.slice().reverse().map(i => `
+    <div class="card">
+      <div class="tone">${i.tone || "Reflective"}</div>
+      <div class="ts">${fmt(i.ts)}</div>
+      <div class="txt">${i.text}</div>
+    </div>
+  `).join("");
+}
   function setMode(m){
     saveJSON(modeKey, m);
     modeGuidance.classList.toggle('active', m==='Guidance');
@@ -166,16 +228,15 @@
   modeGuidance.addEventListener('click', ()=> setMode('Guidance'));
   modeCreation.addEventListener('click', ()=> setMode('Creation'));
 
-  logBtn.addEventListener('click', ()=>{
-    const text = visionInput.value.trim();
-    if(!text) return;
-    const mem = loadJSON(memoryKey, []);
-    const tone = classifyTone(text);
-    mem.push({ text, tone, ts: now() });
-    saveJSON(memoryKey, mem);
-    visionInput.value = '';
-    renderMemory();
-  });
+  logBtn.addEventListener("click", async () => {
+  const ta = document.querySelector("#visionInput");
+  const text = (ta.value || "").trim();
+  if (!text) return;
+  const tone = classifyTone(text);
+  await saveReflectionDual(text, tone);
+  ta.value = "";
+  await syncFromServerIntoUI();
+});
   exportBtn.addEventListener('click', ()=>{
     const data = loadJSON(memoryKey, []);
     const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
@@ -201,4 +262,16 @@
   renderMemory();
   setInterval(driftIfGuidance, 4000);
   refreshGates();
+
+  window.addEventListener("load", async () => {
+  const base = apiBase();
+  const badge = document.querySelector("#onlineBadge");
+  if (base) {
+    try {
+      const h = await getJSON(`${base}/health`);
+      if (h?.ok && badge) badge.textContent = "Online";
+    } catch {}
+    await syncFromServerIntoUI();
+  }
+});
 })();
