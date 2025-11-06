@@ -24,7 +24,7 @@ app.get("/gates", (_req, res) => res.json({ gates }));
 
 app.get("/memory", (req, res) => {
   const limit = Math.min(parseInt(req.query.limit || "200", 10), 1000);
-  res.json({ items: memory.slice(-limit) });
+  res.json(memory);
 });
 
 app.post("/memory", (req, res) => {
