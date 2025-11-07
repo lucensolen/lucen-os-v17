@@ -3,9 +3,16 @@ console.log("Lucen script loaded successfully");
 
 (function() {
   const memoryKey = 'lucen.memory';
-  const modeKey = 'nucleos.mode';
-  const divisionsKey = 'lucen.divisions';
-  const apiUrlKey = 'lucen.api.url';
+const modeKey = 'nucleos.mode';
+const divisionsKey = 'lucen.divisions';
+const apiUrlKey = 'lucen.api.url';
+
+// Load saved API URL into the input field if it exists
+const savedApi = localStorage.getItem('lucen.api');
+if (savedApi) {
+  const apiUrlInput = document.querySelector('#apiUrlInput');
+  if (apiUrlInput) apiUrlInput.value = savedApi;
+}
 
   const now = () => new Date().toISOString();
 
