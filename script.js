@@ -265,14 +265,26 @@ function renderServerMemory(items) {
   refreshGates();
 
   window.addEventListener("load", async () => {
-  const base = apiBase();
+  const base = localStorage.getItem("lucen.api") || document.querySelector("#apiBase")?.value || "";
   const badge = document.querySelector("#onlineBadge");
-  if (base) {
-    try {
-      const h = await getJSON(`${base}/health`);
-      if (h?.ok && badge) badge.textContent = "Online";
-    } catch {}
-    await syncFromServerIntoUI();
+
+  if (!base) {
+    if (badge) badge.textContent = "Offline";
+    return;
+  }
+
+  try {
+    const res = await fetch(`${base}/health`);
+    const data = await res.json();
+    if (data.ok) {
+      if (badge) {
+        badge.textContent = "Online";
+        badge.classList.add("online");
+      }
+    } else if (badge) {
+      badge.textContent = "Offline";
+    }
+  } catch (e) {
+    if (badge) badge.textContent = "Offline";
   }
 });
-})();
