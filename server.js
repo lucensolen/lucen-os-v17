@@ -3,7 +3,15 @@ const express = require("express");
 const cors = require("cors");
 
 const app = express();
-app.use(cors());
+
+app.use(cors({
+  origin: [
+    "https://lucensolen.github.io",
+    "https://lucensolen.github.io/lucen-os-v17",
+    "http://localhost:8081"
+  ],
+  methods: ["GET", "POST"],
+}));
 app.use(express.json());
 
 // In-memory buffers (survive process life, not restarts)
@@ -24,7 +32,7 @@ app.get("/gates", (_req, res) => res.json({ gates }));
 
 app.get("/memory", (req, res) => {
   const limit = Math.min(parseInt(req.query.limit || "200", 10), 1000);
-  res.json({ items: memory.slice(-limit) });
+  res.json(memory);
 });
 
 app.post("/memory", (req, res) => {

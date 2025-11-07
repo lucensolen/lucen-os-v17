@@ -1,23 +1,47 @@
 // enhanced front-end with divisions + gates URL field
-(function(){
+console.log("Lucen script loaded successfully");
+
+(function() {
   const memoryKey = 'lucen.memory';
-  const modeKey = 'nucleos.mode';
-  const divisionsKey = 'lucen.divisions';
-  const apiUrlKey = 'lucen.api.url';
+const modeKey = 'nucleos.mode';
+const divisionsKey = 'lucen.divisions';
+const apiUrlKey = 'lucen.api.url';
+
+// Load saved API URL into the input field if it exists
+const savedApi = localStorage.getItem('lucen.api');
+if (savedApi) {
+  const apiUrlInput = document.querySelector('#apiUrlInput');
+  if (apiUrlInput) apiUrlInput.value = savedApi;
+}
 
   const now = () => new Date().toISOString();
-  const loadJSON = (k, d)=>{try{ return JSON.parse(localStorage.getItem(k) || JSON.stringify(d)); }catch(e){ return d; }};
-  const saveJSON = (k, v)=> localStorage.setItem(k, JSON.stringify(v));
-  const escapeHtml = (s)=> s.replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-  const tabs = [...document.querySelectorAll('.tab')];
+  const loadJSON = (k, d) => {
+    try {
+      return JSON.parse(localStorage.getItem(k)) || d;
+    } catch (e) {
+      return d;
+    }
+  };
+
+  const saveJSON = (k, v) => {
+    localStorage.setItem(k, JSON.stringify(v));
+  };
+
+  const escapeHtml = (s) =>
+    s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  const tabs = [...document.querySelectorAll('[data-tab]')];
   const panels = [...document.querySelectorAll('.tab-panel')];
-  tabs.forEach(btn=> btn.addEventListener('click', ()=>{
-    tabs.forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    const tab = btn.dataset.tab;
-    panels.forEach(p=> p.classList.toggle('hidden', p.dataset.tab !== tab));
-  }));
+
+  tabs.forEach((btn) =>
+    btn.addEventListener('click', () => {
+      tabs.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      const tab = btn.dataset.tab;
+      panels.forEach((p) => p.classList.toggle('hidden', p.dataset.tab !== tab));
+    })
+  );
 
   const controlsEl = document.getElementById('controls');
   const beam = document.getElementById('beam');
@@ -253,10 +277,16 @@ function renderServerMemory(items) {
   closeVision.addEventListener('click', ()=> visionModal.classList.add('hidden'));
 
   saveApiUrlBtn.addEventListener('click', ()=>{
-    const val = (apiUrlInput.value||'').trim();
-    saveJSON(apiUrlKey, val);
-    refreshGates();
-  });
+  const val = (apiUrlInput.value || '').trim();
+  if (!val) {
+    alert('Please enter a valid API URL');
+    return;
+  }
+  localStorage.setItem('lucen.api', val);
+  apiUrlInput.value = val;
+  refreshGates();
+  alert('API URL saved successfully');
+});
 
   setMode(loadJSON(modeKey, 'Guidance'));
   renderMemory();
@@ -264,14 +294,28 @@ function renderServerMemory(items) {
   refreshGates();
 
   window.addEventListener("load", async () => {
-  const base = apiBase();
+  const base = localStorage.getItem("lucen.api") || "https://lucen-os-v17.onrender.com";
   const badge = document.querySelector("#onlineBadge");
-  if (base) {
-    try {
-      const h = await getJSON(`${base}/health`);
-      if (h?.ok && badge) badge.textContent = "Online";
-    } catch {}
-    await syncFromServerIntoUI();
+
+  if (!base) {
+    if (badge) badge.textContent = "Offline";
+    return;
+  }
+
+  try {
+    const res = await fetch(`${base}/health`);
+    const data = await res.json();
+    if (data.ok) {
+      if (badge) {
+        badge.textContent = "Online";
+        badge.classList.add("online");
+      }
+    } else if (badge) {
+      badge.textContent = "Offline";
+    }
+  } catch (e) {
+    if (badge) badge.textContent = "Offline";
   }
 });
-})();
+
+})(); // closes the Lucen self-invoking function
