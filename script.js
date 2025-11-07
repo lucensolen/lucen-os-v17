@@ -1,24 +1,40 @@
 // enhanced front-end with divisions + gates URL field
-(function(){
+console.log("Lucen script loaded successfully");
+
+(function() {
   const memoryKey = 'lucen.memory';
   const modeKey = 'nucleos.mode';
   const divisionsKey = 'lucen.divisions';
   const apiUrlKey = 'lucen.api.url';
-  localStorage.setItem(apiUrlKey, "https://lucen-os-v17.onrender.com");
 
   const now = () => new Date().toISOString();
-  const loadJSON = (k, d)=>{try{ return JSON.parse(localStorage.getItem(k) || JSON.stringify(d)); }catch(e){ return d; }};
-  const saveJSON = (k, v)=> localStorage.setItem(k, JSON.stringify(v));
-  const escapeHtml = (s)=> s.replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-  const tabs = [...document.querySelectorAll('.tab')];
+  const loadJSON = (k, d) => {
+    try {
+      return JSON.parse(localStorage.getItem(k)) || d;
+    } catch (e) {
+      return d;
+    }
+  };
+
+  const saveJSON = (k, v) => {
+    localStorage.setItem(k, JSON.stringify(v));
+  };
+
+  const escapeHtml = (s) =>
+    s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  const tabs = [...document.querySelectorAll('[data-tab]')];
   const panels = [...document.querySelectorAll('.tab-panel')];
-  tabs.forEach(btn=> btn.addEventListener('click', ()=>{
-    tabs.forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    const tab = btn.dataset.tab;
-    panels.forEach(p=> p.classList.toggle('hidden', p.dataset.tab !== tab));
-  }));
+
+  tabs.forEach((btn) =>
+    btn.addEventListener('click', () => {
+      tabs.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      const tab = btn.dataset.tab;
+      panels.forEach((p) => p.classList.toggle('hidden', p.dataset.tab !== tab));
+    })
+  );
 
   const controlsEl = document.getElementById('controls');
   const beam = document.getElementById('beam');
@@ -288,3 +304,5 @@ function renderServerMemory(items) {
     if (badge) badge.textContent = "Offline";
   }
 });
+
+})(); // closes the Lucen self-invoking function
