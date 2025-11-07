@@ -294,7 +294,7 @@ function renderServerMemory(items) {
   refreshGates();
 
   window.addEventListener("load", async () => {
-  const base = localStorage.getItem("lucen.api") || document.querySelector("#apiBase")?.value || "";
+  const base = localStorage.getItem("lucen.api") || "https://lucen-os-v17.onrender.com";
   const badge = document.querySelector("#onlineBadge");
 
   if (!base) {
