@@ -270,10 +270,16 @@ function renderServerMemory(items) {
   closeVision.addEventListener('click', ()=> visionModal.classList.add('hidden'));
 
   saveApiUrlBtn.addEventListener('click', ()=>{
-    const val = (apiUrlInput.value||'').trim();
-    saveJSON(apiUrlKey, val);
-    refreshGates();
-  });
+  const val = (apiUrlInput.value || '').trim();
+  if (!val) {
+    alert('Please enter a valid API URL');
+    return;
+  }
+  localStorage.setItem('lucen.api', val);
+  apiUrlInput.value = val;
+  refreshGates();
+  alert('API URL saved successfully');
+});
 
   setMode(loadJSON(modeKey, 'Guidance'));
   renderMemory();
