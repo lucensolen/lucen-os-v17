@@ -3,7 +3,15 @@ const express = require("express");
 const cors = require("cors");
 
 const app = express();
-app.use(cors());
+
+app.use(cors({
+  origin: [
+    "https://lucensolen.github.io",
+    "https://lucensolen.github.io/lucen-os-v17",
+    "http://localhost:8081"
+  ],
+  methods: ["GET", "POST"],
+}));
 app.use(express.json());
 
 // In-memory buffers (survive process life, not restarts)
